@@ -1,6 +1,9 @@
 # If you want to use a dye as item,
 # replace the values in your config.conf
-# with the ones here.
+# with the ones here. If you use an invalid
+# dye, the plugin will revert back to the 
+# original ones provided with the creation
+# of the configuration.
 #
 # For actual representation of the dye's
 # please check http://minecraft.gamepedia.com/Dye#Colors
