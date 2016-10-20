@@ -1,0 +1,36 @@
+name: Visibility
+main: nl.tomudding.plugins.visibility.Visibility
+version: 2.1
+
+commands:
+  hide:
+    description: Hide other players
+    usage: /<command>
+  show:
+    description: Show other players
+    usage: /<command>
+  visibility:
+    description: The help for Player Visibility
+    usage: /<command>
+
+permissions:
+  visibility.*:
+    description: Gives access to all Visibility permissions
+    default: op
+    children:
+      visibility.cooldown: true
+      visibility.hide: true
+      visibility.ignore: true
+      visibility.show: true
+  visibility.cooldown:
+    description: A bypass for the cooldown
+    default: op
+  visibility.hide:
+    description: Allows a player to hide other players
+    default: op
+  visibility.ignore:
+    description: A bypass to stay visible when toggled invisible
+    default: op
+  visibility.show:
+    description: Allows a player to show other players
+    default: op
