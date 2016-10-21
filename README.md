@@ -10,6 +10,6 @@ Within that same configuration file you can edit messages, items, cooldown, etc.
 
 ### Download?
 I try to share as much code as possible between the Bukkit and Sponge version. Individual downloads are aviable through their respective download providers.  
-[Ore @ Sponge](https://ore-staging.spongepowered.org/tomudding)  
 [BukkitDev @ Bukkit](https://dev.bukkit.org/bukkit-plugins/player-visibility/)  
+[Ore @ Sponge](https://ore-staging.spongepowered.org/tomudding)  
 
