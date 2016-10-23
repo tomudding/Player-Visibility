@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import nl.tomudding.plugins.visibility.commands.Commands;
@@ -19,6 +22,7 @@ public class Visibility extends JavaPlugin {
 	public PlayerManager settings = PlayerManager.getInstance();
 
 	public static boolean isDyeEnabled = false;
+	public static boolean actionBar = true;
 
 	public static int timeCooldown = 10;
 	public static int itemSlot = 8;
@@ -42,15 +46,24 @@ public class Visibility extends JavaPlugin {
 	public static String messageAlreadyOff = "&7All players are already &coff!";
 	public static String messageNoSwitch = "&cYou can't change this item its place.";
 	public static String configVersion = "0.0";
-	
-	/**
-	 * List variables
-	 */
+
 	public static List<String> enabledWorlds;
 	public static ArrayList<UUID> inCooldown = new ArrayList<UUID>();
 	
 	public void onEnable() {
 		ChatManager.getInstance().log("Starting Player Visibility for Bukkit");
+		
+		if (!(getServerVersion().equalsIgnoreCase("v1_9_R1")) && !(getServerVersion().equalsIgnoreCase("v1_9_R2")) && !(getServerVersion().equalsIgnoreCase("v1_10_R1"))) {
+			ChatManager.getInstance().log("&c==========================================");
+			ChatManager.getInstance().log("&cWARNING: Your server software is outdated!");
+			ChatManager.getInstance().log("&cWARNING: This plugin requires at least");
+			ChatManager.getInstance().log("&cWARNING: Minecraft version 1.9 or higher.");
+			ChatManager.getInstance().log("&c==========================================");
+			ChatManager.getInstance().log("Disabling Player Visibility for Bukkit");
+			Plugin plugin = Bukkit.getPluginManager().getPlugin("Visibility");
+			plugin.getPluginLoader().disablePlugin(plugin);
+			return;
+		}
 		
 		saveDefaultConfig();
 		
@@ -59,7 +72,7 @@ public class Visibility extends JavaPlugin {
 		
 		loadConfig();
 		
-		if (!getDescription().getVersion().equals(configVersion)) {
+		if (!StringUtils.substring(getDescription().getVersion(), 0, 3).equals(configVersion)) {
 			ChatManager.getInstance().log("&cWARNING: Config.yml version: "+Visibility.configVersion+". Plugin version: "+getDescription().getVersion()+"!");
 			ChatManager.getInstance().log("&cWARNING: Config.yml is not the correct version, delete 'config.yml' and restart the server!");
 		} else {
@@ -79,8 +92,13 @@ public class Visibility extends JavaPlugin {
 		ChatManager.getInstance().log("Player Visibility for Bukkit is now disabled");
 	}
 	
+	public static String getServerVersion() {
+		return Bukkit.getServer().getClass().getPackage().getName().substring(23);
+	}
+	
 	public void loadConfig() {
 		Visibility.isDyeEnabled = getConfig().getBoolean("enableDye");
+		Visibility.actionBar = getConfig().getBoolean("messages.actionbar");
 		
 		Visibility.dyeColorOn = getConfig().getString("item.true.dye");
 		Visibility.dyeColorOff = getConfig().getString("item.false.dye");
@@ -106,6 +124,6 @@ public class Visibility extends JavaPlugin {
 		
 		Visibility.enabledWorlds = getConfig().getStringList("Enabled-Worlds");
 		
-		Visibility.configVersion = Double.toString(getConfig().getDouble("config"));
+		Visibility.configVersion = getConfig().getString("config");
 	}
 }
