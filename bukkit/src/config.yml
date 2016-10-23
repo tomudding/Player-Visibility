@@ -10,26 +10,27 @@
 # GRAY, SILVER, CYAN, PURPLE, BLUE, BROWN, GREEN, RED, BLACK
 
 Enabled-Worlds:
-  - world
-  - world 1
-  - world 2
+  - "world"
+  - "world 1"
+  - "world 2"
 
 enableDye: false
 
 item:
   slot: 8
   on:
-    item: SLIME_BALL
-    dye: LIME
+    item: "SLIME_BALL"
+    dye: "LIME"
     name: "&7Players are &aon!"
     lore: "&7Toggle player visibility to &coff"
   off:
-    item: MAGMA_CREAM
-    dye: GRAY
+    item: "MAGMA_CREAM"
+    dye: "GRAY"
     name: "&7Players are &coff!"
     lore: "&7Toggle player visibility to &aon"
 
 messages:
+  actionbar: true
   prefix: "&9Visibility > "
   toggle:
     on:  "&7All players are turned &aon!"
@@ -44,4 +45,4 @@ messages:
 
 cooldown: 10
 
-config: 2.1
+config: "2.2"
