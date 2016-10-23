@@ -100,6 +100,7 @@ public class PlayerListener implements Listener {
 			if (player.getInventory().getItemInMainHand().equals(createItemStack(true))) {
 				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld); return; }
 				if (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) return;
+				if (event.getItem().getType().isBlock()) event.setCancelled(true);
 				if (player.hasPermission("visibility.hide")) {
 					if (!Visibility.inCooldown.contains(player.getUniqueId())) {
 						for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
@@ -133,6 +134,7 @@ public class PlayerListener implements Listener {
 			} else if (player.getInventory().getItemInMainHand().equals(createItemStack(false))) {
 				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld); return; }
 				if (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) return;
+				if (event.getItem().getType().isBlock()) event.setCancelled(true);
 				if (player.hasPermission("visibility.show")) {
 					if (!Visibility.inCooldown.contains(player.getUniqueId())) {
 						for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
