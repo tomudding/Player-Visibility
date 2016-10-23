@@ -27,29 +27,31 @@ public class Commands implements CommandExecutor {
 			if (sender instanceof Player) {
 				Player player = (Player) sender;
 				if (args.length == 0) {
-					ChatManager.getInstance().sendCommandMessage(player, ChatColor.BLUE + "============ " + ChatColor.GRAY + "Visibility Help" + ChatColor.BLUE + " ============");
-					ChatManager.getInstance().sendCommandMessage(player, ChatColor.BLUE + "/"+cmd.getName().toLowerCase().toString()+"" + ChatColor.GRAY + " - This help menu");
-					ChatManager.getInstance().sendCommandMessage(player, ChatColor.BLUE + "/"+cmd.getName().toLowerCase().toString()+" info" + ChatColor.GRAY + " - Information about the plugin");
+					ChatManager.getInstance().sendCommandMessage(player, ChatColor.YELLOW + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.YELLOW + " ----------");
+					ChatManager.getInstance().sendCommandMessage(player, ChatColor.GOLD + "/"+cmd.getName().toLowerCase().toString()+"" + ChatColor.DARK_AQUA + " - This help menu");
+					ChatManager.getInstance().sendCommandMessage(player, ChatColor.GOLD + "/"+cmd.getName().toLowerCase().toString()+" info" + ChatColor.DARK_AQUA + " - Information about the plugin");
+					ChatManager.getInstance().sendCommandMessage(player, ChatColor.GOLD + "/hide" + ChatColor.DARK_AQUA + " - Hide players");
+					ChatManager.getInstance().sendCommandMessage(player, ChatColor.GOLD + "/show" + ChatColor.DARK_AQUA + " - Show players");
 					return true;
 				} else if (args.length == 1) {
 					if (args[0].equalsIgnoreCase("info")) {
-						ChatManager.getInstance().sendCommandMessage(player, ChatColor.BLUE + "============ " + ChatColor.GRAY + "Visibility Information" + ChatColor.BLUE + " ============");
-						ChatManager.getInstance().sendCommandMessage(player, ChatColor.GRAY + "Plugin by - " + ChatColor.BLUE + "tomudding");
-						ChatManager.getInstance().sendCommandMessage(player, ChatColor.GRAY + "Plugin version - " + ChatColor.BLUE + plugin.getDescription().getVersion());
+						ChatManager.getInstance().sendCommandMessage(player, ChatColor.YELLOW + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.YELLOW + " ----------");
+						ChatManager.getInstance().sendCommandMessage(player, ChatColor.DARK_AQUA + "Plugin by - " + ChatColor.GOLD + "tomudding");
+						ChatManager.getInstance().sendCommandMessage(player, ChatColor.DARK_AQUA + "Plugin version - " + ChatColor.GOLD + plugin.getDescription().getVersion());
 						return true;
 					}
 				}
 			} else {
 				if (args.length == 0) {
-					ChatManager.getInstance().log(ChatColor.BLUE + "============ " + ChatColor.GRAY + "Visibility Help" + ChatColor.BLUE + " ============");
-					ChatManager.getInstance().log(ChatColor.BLUE + "/"+cmd.getName().toLowerCase().toString()+"" + ChatColor.GRAY + " - This help menu");
-					ChatManager.getInstance().log(ChatColor.BLUE + "/"+cmd.getName().toLowerCase().toString()+" info" + ChatColor.GRAY + " - Information about the plugin");
+					ChatManager.getInstance().log(ChatColor.YELLOW + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.YELLOW + " ----------");
+					ChatManager.getInstance().log(ChatColor.GOLD + "/"+cmd.getName().toLowerCase().toString()+"" + ChatColor.DARK_AQUA + " - This help menu");
+					ChatManager.getInstance().log(ChatColor.GOLD + "/"+cmd.getName().toLowerCase().toString()+" info" + ChatColor.DARK_AQUA + " - Information about the plugin");
 					return true;
 				} else if (args.length == 1) {
 					if (args[0].equalsIgnoreCase("info")) {
-						ChatManager.getInstance().log(ChatColor.BLUE + "============ " + ChatColor.GRAY + "Player Visibility Information" + ChatColor.BLUE + " ============");
-						ChatManager.getInstance().log(ChatColor.GRAY + "Plugin by - " + ChatColor.BLUE + "tomudding");
-						ChatManager.getInstance().log(ChatColor.GRAY + "Plugin version - " + ChatColor.BLUE + plugin.getDescription().getVersion());
+						ChatManager.getInstance().log(ChatColor.YELLOW + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.YELLOW + " ----------");
+						ChatManager.getInstance().log(ChatColor.DARK_AQUA + "Plugin by - " + ChatColor.GOLD + "tomudding");
+						ChatManager.getInstance().log(ChatColor.DARK_AQUA + "Plugin version - " + ChatColor.GOLD + plugin.getDescription().getVersion());
 						return true;
 					}
 				}
