@@ -1,0 +1,48 @@
+# If you want to use special characters in this document, such as accented letters, you MUST save the file as UTF-8, not ANSI
+# If it is saved as an ANSI file it will return an illegal character error
+# If you receive an error while Player Visibility loads, ensure that:
+#   - No tabs are present: YAML only allows spaces
+#   - Indents are correct: YAML hierarchy is based entirely on indentation
+#   - Text with symbols is enclosed in single or double quotation marks
+
+# When using the dye option please use one of the following options:
+# WHITE, ORANGE, MAGENTA, LIGHT_BLUE, YELLOW, LIME, PINK,
+# GRAY, SILVER, CYAN, PURPLE, BLUE, BROWN, GREEN, RED, BLACK
+
+Enabled-Worlds:
+  - "world"
+  - "world 1"
+  - "world 2"
+
+enableDye: false
+
+item:
+  slot: 8
+  on:
+    item: "SLIME_BALL"
+    dye: "LIME"
+    name: "&7Players are &aon!"
+    lore: "&7Toggle player visibility to &coff"
+  off:
+    item: "MAGMA_CREAM"
+    dye: "GRAY"
+    name: "&7Players are &coff!"
+    lore: "&7Toggle player visibility to &aon"
+
+messages:
+  actionbar: true
+  prefix: "&9Visibility > "
+  toggle:
+    on:  "&7All players are turned &aon!"
+    off: "&7All players are turned &coff!"
+    already:
+      on: "&7All players are already &aon!"
+      off: "&7All players are already &coff!"
+  permission: "&cYou don't have the permissions to do that."
+  cooldown: "&7Please wait 10 seconds before toggling again."
+  world: "&cYou can't hide/unhide players in this world."
+  switch: "&cYou can't change this item its place."
+
+cooldown: 10
+
+config: "2.2"
