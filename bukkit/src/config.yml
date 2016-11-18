@@ -29,6 +29,8 @@ item:
     name: "&7Players are &coff!"
     lore: "&7Toggle player visibility to &aon"
 
+cooldown: 10
+
 messages:
   actionbar: true
   prefix: "&9Visibility > "
@@ -39,10 +41,8 @@ messages:
       on: "&7All players are already &aon!"
       off: "&7All players are already &coff!"
   permission: "&cYou don't have the permissions to do that."
-  cooldown: "&7Please wait 10 seconds before toggling again."
+  cooldown: "&7Please wait &e%time%&7 seconds before toggling again."
   world: "&cYou can't hide/unhide players in this world."
   switch: "&cYou can't change this item its place."
 
-cooldown: 10
-
-config: "2.2"
+config: "2.3"
