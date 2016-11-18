@@ -6,10 +6,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import nl.tomudding.plugins.visibility.Visibility;
-import nl.tomudding.plugins.visibility.listeners.PlayerListener;
 import nl.tomudding.plugins.visibility.managers.ChatManager;
 import nl.tomudding.plugins.visibility.managers.PlayerManager;
 
@@ -21,142 +19,94 @@ public class Commands implements CommandExecutor {
 		this.plugin = plugin;
 	}
 	
-	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (cmd.getName().equalsIgnoreCase("visibility")) {
-			if (sender instanceof Player) {
-				Player player = (Player) sender;
+		if (sender instanceof Player) {
+			Player player = (Player) sender;
+			
+			if (cmd.getName().equalsIgnoreCase("visibility")) {
 				if (args.length == 0) {
-					ChatManager.getInstance().sendCommandMessage(player, ChatColor.YELLOW + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.YELLOW + " ----------");
-					ChatManager.getInstance().sendCommandMessage(player, ChatColor.GOLD + "/"+cmd.getName().toLowerCase().toString()+"" + ChatColor.DARK_AQUA + " - This help menu");
-					ChatManager.getInstance().sendCommandMessage(player, ChatColor.GOLD + "/"+cmd.getName().toLowerCase().toString()+" info" + ChatColor.DARK_AQUA + " - Information about the plugin");
-					ChatManager.getInstance().sendCommandMessage(player, ChatColor.GOLD + "/hide" + ChatColor.DARK_AQUA + " - Hide players");
-					ChatManager.getInstance().sendCommandMessage(player, ChatColor.GOLD + "/show" + ChatColor.DARK_AQUA + " - Show players");
+					player.sendMessage(ChatColor.GOLD + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.GOLD + " ----------");
+					player.sendMessage(ChatColor.GOLD + "/"+cmd.getName().toLowerCase().toString()+"" + ChatColor.DARK_AQUA + " - This help menu");
+					player.sendMessage(ChatColor.GOLD + "/"+cmd.getName().toLowerCase().toString()+" info" + ChatColor.DARK_AQUA + " - Information about the plugin");
+					player.sendMessage(ChatColor.GOLD + "/hide" + ChatColor.DARK_AQUA + " - Hide players");
+					player.sendMessage(ChatColor.GOLD + "/show" + ChatColor.DARK_AQUA + " - Show players");
 					return true;
-				} else if (args.length == 1) {
-					if (args[0].equalsIgnoreCase("info")) {
-						ChatManager.getInstance().sendCommandMessage(player, ChatColor.YELLOW + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.YELLOW + " ----------");
-						ChatManager.getInstance().sendCommandMessage(player, ChatColor.DARK_AQUA + "Plugin by - " + ChatColor.GOLD + "tomudding");
-						ChatManager.getInstance().sendCommandMessage(player, ChatColor.DARK_AQUA + "Plugin version - " + ChatColor.GOLD + plugin.getDescription().getVersion());
-						return true;
+				} else if ((args.length == 1) && (args[0].equalsIgnoreCase("info"))) {
+					player.sendMessage(ChatColor.GOLD + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.GOLD + " ----------");
+					player.sendMessage(ChatColor.DARK_AQUA + "Plugin by - " + ChatColor.GOLD + "tomudding");
+					player.sendMessage(ChatColor.DARK_AQUA + "Plugin version - " + ChatColor.GOLD + plugin.getDescription().getVersion());
+					return true;
+				}
+			} else if (cmd.getName().equalsIgnoreCase("hide")) {
+				if (!player.hasPermission("visibility.command.hide")) { ChatManager.getInstance().sendMessage(player, Visibility.messagePermission, true); return true; }
+				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld, true); return true; }
+				if (PlayerManager.getInstance().getToggleState(player.getUniqueId()) == false) { ChatManager.getInstance().sendMessage(player, Visibility.messageAlreadyOff, true); return true; }
+				if (PlayerManager.getInstance().getToggleState(player.getUniqueId()) == true) { ChatManager.getInstance().sendMessage(player, Visibility.messageAlreadyOn, true); return true; }
+				if (Visibility.inCooldown.containsKey(player.getUniqueId())) {
+					long timeLeft = Visibility.inCooldown.get(player.getUniqueId()).longValue() / 1000L + Visibility.timeCooldown - (System.currentTimeMillis() / 1000L);
+					if (timeLeft > 0L) {
+						ChatManager.getInstance().sendMessage(player, Visibility.messageCooldown.replace("%time%", Long.toString(timeLeft)), true);
+					} else {
+						Visibility.removeCooldown(player, false);
+					}
+					return true;
+				}
+				
+				if (!player.hasPermission("visibility.cooldown")) { Visibility.setCooldown(player, false); }
+				player.getInventory().setItem(Visibility.itemSlot, Visibility.createItemStack(false));
+				
+				for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+					if (!onlinePlayers.hasPermission("visibility.ignore")) {
+						player.hidePlayer(onlinePlayers);
 					}
 				}
-			} else {
+
+				PlayerManager.getInstance().setToggle(player.getUniqueId(), false);
+				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOff, true);
+				return true;
+			} else if (cmd.getName().equalsIgnoreCase("show")) {
+				if (!player.hasPermission("visibility.command.show")) { ChatManager.getInstance().sendMessage(player, Visibility.messagePermission, true); return true; }
+				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld, true); return true; }
+				if (PlayerManager.getInstance().getToggleState(player.getUniqueId()) == true) { ChatManager.getInstance().sendMessage(player, Visibility.messageAlreadyOn, true); return true; }
+				if (Visibility.inCooldown.containsKey(player.getUniqueId())) {
+					long timeLeft = Visibility.inCooldown.get(player.getUniqueId()).longValue() / 1000L + Visibility.timeCooldown - (System.currentTimeMillis() / 1000L);
+					if (timeLeft > 0L) {
+						ChatManager.getInstance().sendMessage(player, Visibility.messageCooldown.replace("%time%", Long.toString(timeLeft)), true);
+					} else {
+						Visibility.removeCooldown(player, true);
+					}
+					return true;
+				}
+				
+				if (!player.hasPermission("visibility.cooldown")) { Visibility.setCooldown(player, true); }
+				player.getInventory().setItem(Visibility.itemSlot, Visibility.createItemStack(true));
+				
+				for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+					player.showPlayer(onlinePlayers);
+				}
+				
+				PlayerManager.getInstance().setToggle(player.getUniqueId(), true);
+				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOn, true);
+				return true;
+			}
+		} else {
+			if (cmd.getName().equalsIgnoreCase("visibility")) {
 				if (args.length == 0) {
-					ChatManager.getInstance().log(ChatColor.YELLOW + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.YELLOW + " ----------");
+					ChatManager.getInstance().log(ChatColor.GOLD + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.GOLD + " ----------");
 					ChatManager.getInstance().log(ChatColor.GOLD + "/"+cmd.getName().toLowerCase().toString()+"" + ChatColor.DARK_AQUA + " - This help menu");
 					ChatManager.getInstance().log(ChatColor.GOLD + "/"+cmd.getName().toLowerCase().toString()+" info" + ChatColor.DARK_AQUA + " - Information about the plugin");
 					return true;
-				} else if (args.length == 1) {
-					if (args[0].equalsIgnoreCase("info")) {
-						ChatManager.getInstance().log(ChatColor.YELLOW + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.YELLOW + " ----------");
-						ChatManager.getInstance().log(ChatColor.DARK_AQUA + "Plugin by - " + ChatColor.GOLD + "tomudding");
-						ChatManager.getInstance().log(ChatColor.DARK_AQUA + "Plugin version - " + ChatColor.GOLD + plugin.getDescription().getVersion());
-						return true;
-					}
-				}
-			}
-		} else if (cmd.getName().equalsIgnoreCase("show")) {
-			if (sender instanceof Player) {
-				Player player = (Player) sender;
-				
-				if (player.hasPermission("visibility.show")) {
-					if (Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) {
-						if (PlayerManager.getInstance().getToggleState(player.getUniqueId()) == false) {
-							if (!Visibility.inCooldown.contains(player.getUniqueId())) {
-								for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-									player.showPlayer(onlinePlayers);
-								}
-								
-								player.getInventory().setItem(Visibility.itemSlot, PlayerListener.createItemStack(true));
-								PlayerManager.getInstance().setToggle(player.getUniqueId(), true);
-								
-								if (!player.hasPermission("visibility.cooldown")) {
-									Visibility.inCooldown.add(player.getUniqueId());
-									
-				  		  			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-				  		  			scheduler.scheduleSyncDelayedTask(this.plugin, new Runnable() {
-										@Override
-										public void run() {
-											Visibility.inCooldown.remove(player.getUniqueId());
-										}
-									}, Visibility.timeCooldown * 20);
-								}
-		
-								ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOn);
-								return true;
-							} else {
-								ChatManager.getInstance().sendMessage(player, Visibility.messageCooldown);
-								return true;
-							}
-						} else {
-							ChatManager.getInstance().sendMessage(player, Visibility.messageAlreadyOn);
-							return true;
-						}
-					} else {
-						ChatManager.getInstance().sendMessage(player, Visibility.messageWorld);
-						return true;
-					}
-				} else {
-					ChatManager.getInstance().sendMessage(player, Visibility.messagePermission);
+				} else if ((args.length == 1) && (args[0].equalsIgnoreCase("info"))) {
+					ChatManager.getInstance().log(ChatColor.GOLD + "---------- " + ChatColor.GRAY + "Player Visibility" + ChatColor.GOLD + " ----------");
+					ChatManager.getInstance().log(ChatColor.DARK_AQUA + "Plugin by - " + ChatColor.GOLD + "tomudding");
+					ChatManager.getInstance().log(ChatColor.DARK_AQUA + "Plugin version - " + ChatColor.GOLD + plugin.getDescription().getVersion());
 					return true;
 				}
-			} else {
-				ChatManager.getInstance().log("&cThis command is player-only.");
-				return true;
-			}
-		} else if (cmd.getName().equalsIgnoreCase("hide")) {
-			if (sender instanceof Player) {
-				Player player = (Player) sender;
-				
-				if (player.hasPermission("visibility.hide")) {
-					if (Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) {
-						if (PlayerManager.getInstance().getToggleState(player.getUniqueId()) == true) {
-							if (!Visibility.inCooldown.contains(player.getUniqueId())) {
-								for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-									if (!onlinePlayers.hasPermission("visibility.ignore")) {
-										player.hidePlayer(onlinePlayers);
-									}
-								}
-								
-								player.getInventory().setItem(Visibility.itemSlot, PlayerListener.createItemStack(false));
-								PlayerManager.getInstance().setToggle(player.getUniqueId(), false);
-								
-								if (!player.hasPermission("visibility.cooldown")) {
-									Visibility.inCooldown.add(player.getUniqueId());
-									
-				  		  			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-				  		  			scheduler.scheduleSyncDelayedTask(this.plugin, new Runnable() {
-										@Override
-										public void run() {
-											Visibility.inCooldown.remove(player.getUniqueId());
-										}
-									}, Visibility.timeCooldown * 20);
-								}
-		
-								ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOff);
-								return true;
-							} else {
-								ChatManager.getInstance().sendMessage(player, Visibility.messageCooldown);
-								return true;
-							}
-						} else {
-							ChatManager.getInstance().sendMessage(player, Visibility.messageAlreadyOff);
-							return true;
-						}
-					} else {
-						ChatManager.getInstance().sendMessage(player, Visibility.messageWorld);
-						return true;
-					}
-				} else {
-					ChatManager.getInstance().sendMessage(player, Visibility.messagePermission);
-					return true;
-				}
-			} else {
+			} else if ((cmd.getName().equalsIgnoreCase("hide")) || (cmd.getName().equalsIgnoreCase("show"))) {
 				ChatManager.getInstance().log("&cThis command is player-only.");
 				return true;
 			}
 		}
 		return false;
-	}	
+	}
 }

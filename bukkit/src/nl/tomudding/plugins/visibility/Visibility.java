@@ -1,12 +1,21 @@
 package nl.tomudding.plugins.visibility;
 
-import java.util.ArrayList;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.Dye;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -21,12 +30,21 @@ public class Visibility extends JavaPlugin {
 	protected Logger log;
 	public PlayerManager settings = PlayerManager.getInstance();
 
+	/**
+	 * Boolean variables
+	 */
 	public static boolean isDyeEnabled = false;
 	public static boolean actionBar = true;
 
+	/**
+	 * Int variables
+	 */
 	public static int timeCooldown = 10;
 	public static int itemSlot = 8;
-
+	
+	/**
+	 * String variables
+	 */
 	public static String itemIdOn = "SLIME_BALL";
 	public static String itemIdOff = "MAGMA_CREAM";
 	public static String dyeColorOn = "LIME";
@@ -46,14 +64,17 @@ public class Visibility extends JavaPlugin {
 	public static String messageAlreadyOff = "&7All players are already &coff!";
 	public static String messageNoSwitch = "&cYou can't change this item its place.";
 	public static String configVersion = "0.0";
-
+	
+	/**
+	 * List variables
+	 */
 	public static List<String> enabledWorlds;
-	public static ArrayList<UUID> inCooldown = new ArrayList<UUID>();
+	public static HashMap<UUID, Long> inCooldown = new HashMap<UUID, Long>();
 	
 	public void onEnable() {
 		ChatManager.getInstance().log("Starting Player Visibility for Bukkit");
 		
-		if (!(getServerVersion().equalsIgnoreCase("v1_9_R1")) && !(getServerVersion().equalsIgnoreCase("v1_9_R2")) && !(getServerVersion().equalsIgnoreCase("v1_10_R1"))) {
+		if (!(getServerVersion().contains("1_9")) && !(getServerVersion().contains("1_10")) && !(getServerVersion().contains("v1_11"))) {
 			ChatManager.getInstance().log("&c==========================================");
 			ChatManager.getInstance().log("&cWARNING: Your server software is outdated!");
 			ChatManager.getInstance().log("&cWARNING: This plugin requires at least");
@@ -92,8 +113,118 @@ public class Visibility extends JavaPlugin {
 		ChatManager.getInstance().log("Player Visibility for Bukkit is now disabled");
 	}
 	
+	public static Plugin getInstance() {
+		return Bukkit.getServer().getPluginManager().getPlugin("Visibility");
+	}
+	
 	public static String getServerVersion() {
 		return Bukkit.getServer().getClass().getPackage().getName().substring(23);
+	}
+	
+	public static Class<?> getNMSClass(String nmsClassName) throws ClassNotFoundException {
+		return Class.forName("net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + "." + nmsClassName);
+	}
+	
+    public static ItemStack createItemStack(boolean toggleState) {
+    	ItemStack itemStack = null;
+    	LinkedList<String> itemLore = new LinkedList<String>();
+    	DyeColor dyeColor = null;
+    	
+    	if (toggleState) {
+    		if (Visibility.isDyeEnabled) {
+    			Dye dye = new Dye();
+    			
+    			try {
+    				dyeColor = DyeColor.valueOf(Visibility.dyeColorOn);
+    			} catch (Exception exception) {
+    				ChatManager.getInstance().log("&cWARNING: Config.yml contains invalid DyeColor type (for 'on' state)!");
+    				dyeColor = DyeColor.LIME; // fallback
+    			}
+    			
+    			dye.setColor(dyeColor);
+    			itemStack = dye.toItemStack(1);
+    		} else {
+    			try {
+    				itemStack = new ItemStack(Material.valueOf(Visibility.itemIdOn));
+    			} catch (Exception exception) {
+    				ChatManager.getInstance().log("&cWARNING: Config.yml contains invalid ItemStack type (for 'on' state)!");
+    				itemStack = new ItemStack(Material.SLIME_BALL); // fallback
+    			}
+    		}
+    		
+    		ItemMeta itemMeta = itemStack.getItemMeta();
+	  		itemLore.add(ChatColor.translateAlternateColorCodes('&', Visibility.itemLoreOn));
+	  		itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', Visibility.itemNameOn));
+	  		itemMeta.setLore(itemLore);
+	  		itemStack.setItemMeta(itemMeta);
+    	} else {
+    		if (Visibility.isDyeEnabled) {
+    			Dye dye = new Dye();
+    			
+    			try {
+    				dyeColor = DyeColor.valueOf(Visibility.dyeColorOff);
+    			} catch (Exception exception) {
+    				ChatManager.getInstance().log("&cWARNING: Config.yml contains invalid DyeColor type (for 'off' state)!");
+    				dyeColor = DyeColor.GRAY; // fallback
+    			}
+    			
+    			dye.setColor(dyeColor);
+    			itemStack = dye.toItemStack(1);
+    		} else {
+    			try {
+    				itemStack = new ItemStack(Material.valueOf(Visibility.itemIdOff));
+    			} catch (Exception exception) {
+    				ChatManager.getInstance().log("&cWARNING: Config.yml contains invalid ItemStack type (for 'off' state)!");
+    				itemStack = new ItemStack(Material.MAGMA_CREAM); // fallback
+    			}
+    		}
+    		
+    		ItemMeta itemMeta = itemStack.getItemMeta();
+	  		itemLore.add(ChatColor.translateAlternateColorCodes('&', Visibility.itemLoreOff));
+	  		itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', Visibility.itemNameOff));
+	  		itemMeta.setLore(itemLore);
+	  		itemStack.setItemMeta(itemMeta);
+    	}
+    	
+		return itemStack;
+    }
+	
+	public static void setCooldown(Player player, boolean toggledState) {
+		Visibility.inCooldown.put(player.getUniqueId(), Long.valueOf(System.currentTimeMillis()));
+
+		try {
+			Class<?> nmsItemClass = Visibility.getNMSClass("Item");
+			Method nmsItemMethod = nmsItemClass.getMethod("getById", int.class);
+			@SuppressWarnings("deprecation")
+			Object nmsItemId = nmsItemMethod.invoke(null, Visibility.createItemStack(toggledState).getTypeId());
+			Object packetPlayOutSetCooldown = Visibility.getNMSClass("PacketPlayOutSetCooldown").getConstructor(new Class[] { nmsItemClass, int.class }).newInstance(new Object[] { nmsItemId, 20 * Visibility.timeCooldown});
+	
+			Object playerNMS = player.getClass().getMethod("getHandle", new Class[0]).invoke(player, new Object[0]);
+			Object playerConnection = playerNMS.getClass().getField("playerConnection").get(playerNMS);
+			Class<?> playerPacket = Visibility.getNMSClass("Packet");
+			playerConnection.getClass().getMethod("sendPacket", new Class[] { playerPacket }).invoke(playerConnection, new Object[] { packetPlayOutSetCooldown });
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+	}
+	
+	public static void removeCooldown(Player player, boolean toggledState) {
+		Visibility.inCooldown.remove(player.getUniqueId());
+		
+		try {
+			Class<?> nmsItemClass = Visibility.getNMSClass("Item");
+			Method nmsItemMethod = nmsItemClass.getMethod("getById", int.class);
+			@SuppressWarnings("deprecation")
+			Object nmsItemId = nmsItemMethod.invoke(null, Visibility.createItemStack(toggledState).getTypeId());
+			Object packetPlayOutSetCooldown = Visibility.getNMSClass("PacketPlayOutSetCooldown").getConstructor(new Class[] { nmsItemClass, int.class }).newInstance(new Object[] { nmsItemId, 0 });
+	
+			Object playerNMS = player.getClass().getMethod("getHandle", new Class[0]).invoke(player, new Object[0]);
+			Object playerConnection = playerNMS.getClass().getField("playerConnection").get(playerNMS);
+			Class<?> playerPacket = Visibility.getNMSClass("Packet");
+			playerConnection.getClass().getMethod("sendPacket", new Class[] { playerPacket }).invoke(playerConnection, new Object[] { packetPlayOutSetCooldown });
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
 	}
 	
 	public void loadConfig() {
