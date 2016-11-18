@@ -52,7 +52,7 @@ public class Commands implements CommandExecutor {
 					return true;
 				}
 				
-				if (!player.hasPermission("visibility.cooldown")) { Visibility.setCooldown(player, false); }
+				if (!player.hasPermission("visibility.bypass.cooldown")) { Visibility.setCooldown(player, false); }
 				player.getInventory().setItem(Visibility.itemSlot, Visibility.createItemStack(false));
 				
 				for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
@@ -78,7 +78,7 @@ public class Commands implements CommandExecutor {
 					return true;
 				}
 				
-				if (!player.hasPermission("visibility.cooldown")) { Visibility.setCooldown(player, true); }
+				if (!player.hasPermission("visibility.bypass.cooldown")) { Visibility.setCooldown(player, true); }
 				player.getInventory().setItem(Visibility.itemSlot, Visibility.createItemStack(true));
 				
 				for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {

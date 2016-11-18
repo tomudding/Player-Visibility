@@ -30,21 +30,12 @@ public class Visibility extends JavaPlugin {
 	protected Logger log;
 	public PlayerManager settings = PlayerManager.getInstance();
 
-	/**
-	 * Boolean variables
-	 */
 	public static boolean isDyeEnabled = false;
 	public static boolean actionBar = true;
 
-	/**
-	 * Int variables
-	 */
 	public static int timeCooldown = 10;
 	public static int itemSlot = 8;
-	
-	/**
-	 * String variables
-	 */
+
 	public static String itemIdOn = "SLIME_BALL";
 	public static String itemIdOff = "MAGMA_CREAM";
 	public static String dyeColorOn = "LIME";
@@ -65,9 +56,6 @@ public class Visibility extends JavaPlugin {
 	public static String messageNoSwitch = "&cYou can't change this item its place.";
 	public static String configVersion = "0.0";
 	
-	/**
-	 * List variables
-	 */
 	public static List<String> enabledWorlds;
 	public static HashMap<UUID, Long> inCooldown = new HashMap<UUID, Long>();
 	
@@ -93,7 +81,7 @@ public class Visibility extends JavaPlugin {
 		
 		loadConfig();
 		
-		if (!StringUtils.substring(getDescription().getVersion(), 0, 3).equals(configVersion)) {
+		if (!StringUtils.substring(getDescription().getVersion(), 0, 3).contains(configVersion)) {
 			ChatManager.getInstance().log("&cWARNING: Config.yml version: "+Visibility.configVersion+". Plugin version: "+getDescription().getVersion()+"!");
 			ChatManager.getInstance().log("&cWARNING: Config.yml is not the correct version, delete 'config.yml' and restart the server!");
 		} else {
@@ -138,7 +126,7 @@ public class Visibility extends JavaPlugin {
     				dyeColor = DyeColor.valueOf(Visibility.dyeColorOn);
     			} catch (Exception exception) {
     				ChatManager.getInstance().log("&cWARNING: Config.yml contains invalid DyeColor type (for 'on' state)!");
-    				dyeColor = DyeColor.LIME; // fallback
+    				dyeColor = DyeColor.LIME;
     			}
     			
     			dye.setColor(dyeColor);
@@ -148,7 +136,7 @@ public class Visibility extends JavaPlugin {
     				itemStack = new ItemStack(Material.valueOf(Visibility.itemIdOn));
     			} catch (Exception exception) {
     				ChatManager.getInstance().log("&cWARNING: Config.yml contains invalid ItemStack type (for 'on' state)!");
-    				itemStack = new ItemStack(Material.SLIME_BALL); // fallback
+    				itemStack = new ItemStack(Material.SLIME_BALL);
     			}
     		}
     		
@@ -165,7 +153,7 @@ public class Visibility extends JavaPlugin {
     				dyeColor = DyeColor.valueOf(Visibility.dyeColorOff);
     			} catch (Exception exception) {
     				ChatManager.getInstance().log("&cWARNING: Config.yml contains invalid DyeColor type (for 'off' state)!");
-    				dyeColor = DyeColor.GRAY; // fallback
+    				dyeColor = DyeColor.GRAY;
     			}
     			
     			dye.setColor(dyeColor);
@@ -175,7 +163,7 @@ public class Visibility extends JavaPlugin {
     				itemStack = new ItemStack(Material.valueOf(Visibility.itemIdOff));
     			} catch (Exception exception) {
     				ChatManager.getInstance().log("&cWARNING: Config.yml contains invalid ItemStack type (for 'off' state)!");
-    				itemStack = new ItemStack(Material.MAGMA_CREAM); // fallback
+    				itemStack = new ItemStack(Material.MAGMA_CREAM);
     			}
     		}
     		
@@ -230,20 +218,16 @@ public class Visibility extends JavaPlugin {
 	public void loadConfig() {
 		Visibility.isDyeEnabled = getConfig().getBoolean("enableDye");
 		Visibility.actionBar = getConfig().getBoolean("messages.actionbar");
-		
 		Visibility.dyeColorOn = getConfig().getString("item.true.dye");
 		Visibility.dyeColorOff = getConfig().getString("item.false.dye");
 		Visibility.itemIdOn = getConfig().getString("item.true.item");
 		Visibility.itemIdOff = getConfig().getString("item.false.item");
-		
 		Visibility.timeCooldown = getConfig().getInt("cooldown");
 		Visibility.itemSlot = getConfig().getInt("item.slot");
-		
 		Visibility.itemNameOn = getConfig().getString("item.true.name");
 		Visibility.itemNameOff = getConfig().getString("item.false.name");
 		Visibility.itemLoreOn = getConfig().getString("item.true.lore");
 		Visibility.itemLoreOff = getConfig().getString("item.false.lore");
-		
 		Visibility.messagePrefix = getConfig().getString("messages.prefix");
 		Visibility.messageCooldown = getConfig().getString("messages.cooldown");
 		Visibility.messagePermission = getConfig().getString("messages.permission");
@@ -252,9 +236,7 @@ public class Visibility extends JavaPlugin {
 		Visibility.messageWorld = getConfig().getString("messages.world");
 		Visibility.messageAlreadyOn = getConfig().getString("messages.toggle.already.true");
 		Visibility.messageAlreadyOff = getConfig().getString("messages.toggle.already.false");
-		
 		Visibility.enabledWorlds = getConfig().getStringList("Enabled-Worlds");
-		
 		Visibility.configVersion = getConfig().getString("config");
 	}
 }

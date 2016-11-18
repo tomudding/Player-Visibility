@@ -1,7 +1,7 @@
 name: Visibility
 author: tomudding
 main: nl.tomudding.plugins.visibility.Visibility
-version: 2.3
+version: 2.3.1
 
 commands:
   hide:
