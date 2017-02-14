@@ -1,8 +1,9 @@
 package nl.tomudding.plugins.visibility;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -42,8 +43,6 @@ public class Visibility extends JavaPlugin {
 	public static String dyeColorOff = "GRAY";
 	public static String itemNameOn = "&7Players are &aon!";
 	public static String itemNameOff = "&7Players are &coff!";
-	public static String itemLoreOn = "&7Toggle player visibility to &coff";
-	public static String itemLoreOff = "&7Toggle player visibility to &aon";
 	
 	public static String messagePrefix = "&9Visibility > ";
 	public static String messageCooldown = "&7Please wait 10 seconds before toggling again.";
@@ -57,12 +56,14 @@ public class Visibility extends JavaPlugin {
 	public static String configVersion = "0.0";
 	
 	public static List<String> enabledWorlds;
+	public static ArrayList<String> itemLoreOn = new ArrayList<String>(Arrays.asList("&7Toggle player visibility to &coff"));
+	public static ArrayList<String> itemLoreOff = new ArrayList<String>(Arrays.asList("&7Toggle player visibility to &aon"));
 	public static HashMap<UUID, Long> inCooldown = new HashMap<UUID, Long>();
 	
 	public void onEnable() {
 		ChatManager.getInstance().log("Starting Player Visibility for Bukkit");
 		
-		if (!(getServerVersion().contains("1_9")) && !(getServerVersion().contains("1_10")) && !(getServerVersion().contains("v1_11"))) {
+		if (!(getServerVersion().contains("1_9")) && !(getServerVersion().contains("1_10")) && !(getServerVersion().contains("1_11"))) {
 			ChatManager.getInstance().log("&c==========================================");
 			ChatManager.getInstance().log("&cWARNING: Your server software is outdated!");
 			ChatManager.getInstance().log("&cWARNING: This plugin requires at least");
@@ -115,7 +116,6 @@ public class Visibility extends JavaPlugin {
 	
     public static ItemStack createItemStack(boolean toggleState) {
     	ItemStack itemStack = null;
-    	LinkedList<String> itemLore = new LinkedList<String>();
     	DyeColor dyeColor = null;
     	
     	if (toggleState) {
@@ -141,9 +141,8 @@ public class Visibility extends JavaPlugin {
     		}
     		
     		ItemMeta itemMeta = itemStack.getItemMeta();
-	  		itemLore.add(ChatColor.translateAlternateColorCodes('&', Visibility.itemLoreOn));
+    		itemMeta.setLore(doChatColor(Visibility.itemLoreOn));
 	  		itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', Visibility.itemNameOn));
-	  		itemMeta.setLore(itemLore);
 	  		itemStack.setItemMeta(itemMeta);
     	} else {
     		if (Visibility.isDyeEnabled) {
@@ -168,13 +167,21 @@ public class Visibility extends JavaPlugin {
     		}
     		
     		ItemMeta itemMeta = itemStack.getItemMeta();
-	  		itemLore.add(ChatColor.translateAlternateColorCodes('&', Visibility.itemLoreOff));
+    		itemMeta.setLore(doChatColor(Visibility.itemLoreOff));
 	  		itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', Visibility.itemNameOff));
-	  		itemMeta.setLore(itemLore);
 	  		itemStack.setItemMeta(itemMeta);
     	}
     	
 		return itemStack;
+    }
+    
+    private static ArrayList<String> doChatColor(ArrayList<String> array) {
+    	ArrayList<String> list = new ArrayList<String>();
+    	for (String string : array) {
+    		list.add(ChatColor.translateAlternateColorCodes('&', string));
+    	}
+    	
+    	return list;
     }
 	
 	public static void setCooldown(Player player, boolean toggledState) {
@@ -226,14 +233,15 @@ public class Visibility extends JavaPlugin {
 		Visibility.itemSlot = getConfig().getInt("item.slot");
 		Visibility.itemNameOn = getConfig().getString("item.true.name");
 		Visibility.itemNameOff = getConfig().getString("item.false.name");
-		Visibility.itemLoreOn = getConfig().getString("item.true.lore");
-		Visibility.itemLoreOff = getConfig().getString("item.false.lore");
+		Visibility.itemLoreOn = (ArrayList<String>) getConfig().getStringList("item.true.lore");
+		Visibility.itemLoreOff = (ArrayList<String>) getConfig().getStringList("item.false.lore");
 		Visibility.messagePrefix = getConfig().getString("messages.prefix");
 		Visibility.messageCooldown = getConfig().getString("messages.cooldown");
 		Visibility.messagePermission = getConfig().getString("messages.permission");
 		Visibility.messageToggleOn = getConfig().getString("messages.toggle.true");
 		Visibility.messageToggleOff = getConfig().getString("messages.toggle.false");
 		Visibility.messageWorld = getConfig().getString("messages.world");
+		Visibility.messageNoSwitch = getConfig().getString("messages.switch");
 		Visibility.messageAlreadyOn = getConfig().getString("messages.toggle.already.true");
 		Visibility.messageAlreadyOff = getConfig().getString("messages.toggle.already.false");
 		Visibility.enabledWorlds = getConfig().getStringList("Enabled-Worlds");
