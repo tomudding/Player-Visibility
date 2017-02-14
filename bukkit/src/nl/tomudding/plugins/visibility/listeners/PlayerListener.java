@@ -16,6 +16,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.EquipmentSlot;
 
 import nl.tomudding.plugins.visibility.Visibility;
@@ -44,7 +46,7 @@ public class PlayerListener implements Listener {
 				}
 
 				player.getInventory().setItem(Visibility.itemSlot, Visibility.createItemStack(true));
-				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOn, false);
+				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOn);
 			} else if (PlayerManager.getInstance().checkIfExists(uuid) == true) {
 				ChatManager.getInstance().log("Player " + uuid + " is in data.yml");
 				
@@ -56,7 +58,7 @@ public class PlayerListener implements Listener {
 	  		  		}
 	  		  		
 					player.getInventory().setItem(Visibility.itemSlot, Visibility.createItemStack(true));
-					ChatManager.getInstance().sendMessage(player,  Visibility.messageToggleOn, false);
+					ChatManager.getInstance().sendMessage(player,  Visibility.messageToggleOn);
 				} else if (PlayerManager.getInstance().getToggleState(uuid) == false) {
 	  		  		for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
 	  		  			if (Visibility.enabledWorlds.contains(onlinePlayers.getWorld().getName().toString())) {
@@ -67,7 +69,7 @@ public class PlayerListener implements Listener {
 	  		  		}
 	  		  		
 					player.getInventory().setItem(Visibility.itemSlot, Visibility.createItemStack(false));
-					ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOff, false);
+					ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOff);
 				}
 			}
 			
@@ -92,13 +94,13 @@ public class PlayerListener implements Listener {
 			if (player.getInventory().getItemInMainHand().equals(null) || player.getInventory().getItemInMainHand().equals(Material.AIR)) return;
 			if (player.getInventory().getItemInMainHand().equals(Visibility.createItemStack(true))) {
 				if (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) return;
-				if (!player.hasPermission("visibility.hide")) { ChatManager.getInstance().sendMessage(player, Visibility.messagePermission, false); return; }
-				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld, false); return; }
-				if (event.getItem().getType().isBlock()) event.setCancelled(true);
+				if (!player.hasPermission("visibility.hide")) { ChatManager.getInstance().sendMessage(player, Visibility.messagePermission); return; }
+				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld); return; }
+				event.setCancelled(true);
 				if (Visibility.inCooldown.containsKey(player.getUniqueId())) {
 					long timeLeft = Visibility.inCooldown.get(player.getUniqueId()).longValue() / 1000L + Visibility.timeCooldown - (System.currentTimeMillis() / 1000L);
 					if (timeLeft > 0L) {
-						ChatManager.getInstance().sendMessage(player, Visibility.messageCooldown.replace("%time%", Long.toString(timeLeft)), false);
+						ChatManager.getInstance().sendMessage(player, Visibility.messageCooldown.replace("%time%", Long.toString(timeLeft)));
 					} else {
 						Visibility.removeCooldown(player, false);
 					}
@@ -115,16 +117,16 @@ public class PlayerListener implements Listener {
 				}
 				
 				PlayerManager.getInstance().setToggle(player.getUniqueId(), false);
-				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOff, false);
+				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOff);
 			} else if (player.getInventory().getItemInMainHand().equals(Visibility.createItemStack(false))) {
 				if (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) return;
-				if (!player.hasPermission("visibility.show")) { ChatManager.getInstance().sendMessage(player, Visibility.messagePermission, false); return; }
-				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld, false); return; }
-				if (event.getItem().getType().isBlock()) event.setCancelled(true);
+				if (!player.hasPermission("visibility.show")) { ChatManager.getInstance().sendMessage(player, Visibility.messagePermission); return; }
+				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld); return; }
+				event.setCancelled(true);
 				if (Visibility.inCooldown.containsKey(player.getUniqueId())) {
 					long timeLeft = Visibility.inCooldown.get(player.getUniqueId()).longValue() / 1000L + Visibility.timeCooldown - (System.currentTimeMillis() / 1000L);
 					if (timeLeft > 0L) {
-						ChatManager.getInstance().sendMessage(player, Visibility.messageCooldown.replace("%time%", Long.toString(timeLeft)), false);
+						ChatManager.getInstance().sendMessage(player, Visibility.messageCooldown.replace("%time%", Long.toString(timeLeft)));
 					} else {
 						Visibility.removeCooldown(player, true);
 					}
@@ -139,7 +141,7 @@ public class PlayerListener implements Listener {
 				}
 					
 				PlayerManager.getInstance().setToggle(player.getUniqueId(), true);
-				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOn, false);
+				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOn);
 			}
 		}
 	}
@@ -176,9 +178,9 @@ public class PlayerListener implements Listener {
 			}
 			
 			if (PlayerManager.getInstance().getToggleState(player.getUniqueId()) == true) {
-				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOn, false);
+				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOn);
 			} else if (PlayerManager.getInstance().getToggleState(player.getUniqueId()) == false) {
-				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOff, false);
+				ChatManager.getInstance().sendMessage(player, Visibility.messageToggleOff);
 			}
 		} else {
 			for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
@@ -213,7 +215,19 @@ public class PlayerListener implements Listener {
 		if (Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) {
 			if (event.getOffHandItem().equals(Visibility.createItemStack(true)) || event.getOffHandItem().equals(Visibility.createItemStack(false))) {
 				event.setCancelled(true);
-				ChatManager.getInstance().sendMessage(player, Visibility.messageNoSwitch, false);
+				ChatManager.getInstance().sendMessage(player, Visibility.messageNoSwitch);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onTeleport(PlayerTeleportEvent event) {
+		Player player = event.getPlayer();
+		if (Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) {
+			if (player.getInventory().getItemInMainHand().equals(Visibility.createItemStack(true)) || player.getInventory().getItemInMainHand().equals(Visibility.createItemStack(false))) {
+				if (event.getCause().equals(TeleportCause.ENDER_PEARL) || event.getCause().equals(TeleportCause.CHORUS_FRUIT)) {
+					event.setCancelled(true);
+				}
 			}
 		}
 	}
@@ -223,7 +237,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		if (Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString()) && player.getInventory().getHeldItemSlot() == Visibility.itemSlot) {
 			event.setCancelled(true);
-			ChatManager.getInstance().sendMessage(player, Visibility.messageNoSwitch, false);
+			ChatManager.getInstance().sendMessage(player, Visibility.messageNoSwitch);
 		}
 	}
 	
@@ -232,7 +246,7 @@ public class PlayerListener implements Listener {
 		if (Visibility.enabledWorlds.contains(event.getWhoClicked().getLocation().getWorld().getName().toString()) && 
 			event.getSlot() == Visibility.itemSlot) {
 				event.setCancelled(true);
-				ChatManager.getInstance().sendMessage(plugin.getServer().getPlayer(event.getWhoClicked().getUniqueId()), Visibility.messageNoSwitch, false);
+				ChatManager.getInstance().sendMessage(plugin.getServer().getPlayer(event.getWhoClicked().getUniqueId()), Visibility.messageNoSwitch);
 		}
 	}
 }
