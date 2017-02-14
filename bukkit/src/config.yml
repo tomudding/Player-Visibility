@@ -22,12 +22,14 @@ item:
     item: "SLIME_BALL"
     dye: "LIME"
     name: "&7Players are &aon!"
-    lore: "&7Toggle player visibility to &coff"
+    lore:
+      - "&7Toggle player visibility to &coff"
   off:
     item: "MAGMA_CREAM"
     dye: "GRAY"
     name: "&7Players are &coff!"
-    lore: "&7Toggle player visibility to &aon"
+    lore:
+      - "&7Toggle player visibility to &aon"
 
 cooldown: 10
 
@@ -45,4 +47,4 @@ messages:
   world: "&cYou can't hide/unhide players in this world."
   switch: "&cYou can't change this item its place."
 
-config: "2.3"
+config: "2.4"
