@@ -18,7 +18,7 @@ public class ChatManager {
 	}
 
 	public void sendMessage(Player player, String message) {
-		if (Visibility.actionBar) {
+		if (Visibility.enableActionbar) {
 			try {
 				Object chatComponentText = Visibility.getNMSClass("ChatComponentText").getConstructor(new Class[] { String.class }).newInstance(new Object[] { ChatColor.translateAlternateColorCodes('&', message)});
 				Class<?> iChatBaseComponent = Visibility.getNMSClass("IChatBaseComponent");
@@ -37,7 +37,7 @@ public class ChatManager {
 	}
 	
 	public void sendMessage(Player player, String message, boolean cmd, boolean cmdPrefix) {
-		if (Visibility.actionBar) {
+		if (Visibility.enableActionbar) {
 			try {
 				Object chatComponentText = Visibility.getNMSClass("ChatComponentText").getConstructor(new Class[] { String.class }).newInstance(new Object[] { ChatColor.translateAlternateColorCodes('&', message)});
 				Class<?> iChatBaseComponent = Visibility.getNMSClass("IChatBaseComponent");
@@ -60,5 +60,4 @@ public class ChatManager {
 			player.sendMessage(ChatColor.translateAlternateColorCodes('&', Visibility.messagePrefix + message));
 		}
 	}
-	
 }
