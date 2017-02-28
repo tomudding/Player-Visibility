@@ -9,13 +9,25 @@
 # WHITE, ORANGE, MAGENTA, LIGHT_BLUE, YELLOW, LIME, PINK,
 # GRAY, SILVER, CYAN, PURPLE, BLUE, BROWN, GREEN, RED, BLACK
 
-Enabled-Worlds:
+# enableOffHand overwrites item.slot!
+options:
+  enableActionbar: true
+  enableDyes: false
+  enableItemSwitchMessage: false
+  enableJoinMessage: true
+  enableOffHand: false
+  enableWorldToggleMessage: false
+  enableWorldSwitchMessage: false
+  toggleCooldown: 10
+
+#
+enabled-Worlds:
   - "world"
   - "world 1"
   - "world 2"
 
-enableDye: false
-
+# item.slot should be between 0 and 8!
+# item.slot is ignored when enableOffHand is true
 item:
   slot: 8
   on:
@@ -31,20 +43,17 @@ item:
     lore:
       - "&7Toggle player visibility to &aon"
 
-cooldown: 10
-
 messages:
-  actionbar: true
   prefix: "&9Visibility > "
   toggle:
     on:  "&7All players are turned &aon!"
     off: "&7All players are turned &coff!"
     already:
-      on: "&7All players are already &aon!"
+      on:  "&7All players are already &aon!"
       off: "&7All players are already &coff!"
   permission: "&cYou don't have the permissions to do that."
-  cooldown: "&7Please wait &e%time%&7 seconds before toggling again."
+  toggleCooldown: "&7Please wait &e%time%&7 second(s) before toggling again."
   world: "&cYou can't hide/unhide players in this world."
-  switch: "&cYou can't change this item its place."
+  itemSwitch: "&cYou can't change this item its place."
 
-config: "2.4"
+config: "2.5"
