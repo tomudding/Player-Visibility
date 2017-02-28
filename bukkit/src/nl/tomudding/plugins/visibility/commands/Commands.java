@@ -39,16 +39,16 @@ public class Commands implements CommandExecutor {
 				}
 			} else if (cmd.getName().equalsIgnoreCase("hide")) {
 				if (!player.hasPermission("visibility.command.hide")) { ChatManager.getInstance().sendMessage(player, Visibility.messagePermission, true, false); return true; }
-				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld, true, false); return true; }
+				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { if (Visibility.enableWorldToggleMessage) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld, true, false); } return true; }
 				if (PlayerManager.getInstance().getToggleState(player.getUniqueId()) == false) { ChatManager.getInstance().sendMessage(player, Visibility.messageAlreadyOff, true, true); return true; }
 				if (Visibility.inCooldown.containsKey(player.getUniqueId())) {
-					long timeLeft = Visibility.inCooldown.get(player.getUniqueId()).longValue() / 1000L + Visibility.timeCooldown - (System.currentTimeMillis() / 1000L);
+					long timeLeft = Visibility.inCooldown.get(player.getUniqueId()).longValue() / 1000L + Visibility.toggleCooldown - (System.currentTimeMillis() / 1000L);
 					if (timeLeft > 0L) {
 						ChatManager.getInstance().sendMessage(player, Visibility.messageCooldown.replace("%time%", Long.toString(timeLeft)), true, true);
+						return true;
 					} else {
 						Visibility.removeCooldown(player, false);
 					}
-					return true;
 				}
 				
 				if (!player.hasPermission("visibility.bypass.cooldown")) { Visibility.setCooldown(player, false); }
@@ -65,16 +65,16 @@ public class Commands implements CommandExecutor {
 				return true;
 			} else if (cmd.getName().equalsIgnoreCase("show")) {
 				if (!player.hasPermission("visibility.command.show")) { ChatManager.getInstance().sendMessage(player, Visibility.messagePermission, true, false); return true; }
-				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld, true, false); return true; }
+				if (!Visibility.enabledWorlds.contains(player.getLocation().getWorld().getName().toString())) { if (Visibility.enableWorldToggleMessage) { ChatManager.getInstance().sendMessage(player, Visibility.messageWorld, true, false); } return true; }
 				if (PlayerManager.getInstance().getToggleState(player.getUniqueId()) == true) { ChatManager.getInstance().sendMessage(player, Visibility.messageAlreadyOn, true, true); return true; }
 				if (Visibility.inCooldown.containsKey(player.getUniqueId())) {
-					long timeLeft = Visibility.inCooldown.get(player.getUniqueId()).longValue() / 1000L + Visibility.timeCooldown - (System.currentTimeMillis() / 1000L);
+					long timeLeft = Visibility.inCooldown.get(player.getUniqueId()).longValue() / 1000L + Visibility.toggleCooldown - (System.currentTimeMillis() / 1000L);
 					if (timeLeft > 0L) {
 						ChatManager.getInstance().sendMessage(player, Visibility.messageCooldown.replace("%time%", Long.toString(timeLeft)), true, true);
+						return true;
 					} else {
 						Visibility.removeCooldown(player, true);
 					}
-					return true;
 				}
 				
 				if (!player.hasPermission("visibility.bypass.cooldown")) { Visibility.setCooldown(player, true); }
