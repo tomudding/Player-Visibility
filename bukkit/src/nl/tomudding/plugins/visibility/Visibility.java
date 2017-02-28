@@ -31,10 +31,15 @@ public class Visibility extends JavaPlugin {
 	protected Logger log;
 	public PlayerManager settings = PlayerManager.getInstance();
 
-	public static boolean isDyeEnabled = false;
-	public static boolean actionBar = true;
+	public static boolean enableActionbar = true;
+	public static boolean enableDyes = false;
+	public static boolean enableItemSwitchMessage = false;	
+	public static boolean enableJoinMessage = true;
+	public static boolean enableOffHand = false;
+	public static boolean enableWorldToggleMessage = false;
+	public static boolean enableWorldSwitchMessage = false;
 
-	public static int timeCooldown = 10;
+	public static int toggleCooldown = 10;
 	public static int itemSlot = 8;
 
 	public static String itemIdOn = "SLIME_BALL";
@@ -52,7 +57,7 @@ public class Visibility extends JavaPlugin {
 	public static String messageWorld = "&cYou can't hide/unhide players in this world.";
 	public static String messageAlreadyOn = "&7All players are already &aon!";
 	public static String messageAlreadyOff = "&7All players are already &coff!";
-	public static String messageNoSwitch = "&cYou can't change this item its place.";
+	public static String messageSwitch = "&cYou can't change this item its place.";
 	public static String configVersion = "0.0";
 	
 	public static List<String> enabledWorlds;
@@ -119,7 +124,7 @@ public class Visibility extends JavaPlugin {
     	DyeColor dyeColor = null;
     	
     	if (toggleState) {
-    		if (Visibility.isDyeEnabled) {
+    		if (Visibility.enableDyes) {
     			Dye dye = new Dye();
     			
     			try {
@@ -145,7 +150,7 @@ public class Visibility extends JavaPlugin {
 	  		itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', Visibility.itemNameOn));
 	  		itemStack.setItemMeta(itemMeta);
     	} else {
-    		if (Visibility.isDyeEnabled) {
+    		if (Visibility.enableDyes) {
     			Dye dye = new Dye();
     			
     			try {
@@ -183,6 +188,31 @@ public class Visibility extends JavaPlugin {
     	
     	return list;
     }
+    
+    public static ItemStack getItemInHand(Player player) {
+    	if (Visibility.enableOffHand) {
+    		return player.getInventory().getItemInOffHand();
+    	} else {
+    		if (Visibility.itemSlot >= 0 && Visibility.itemSlot <= 8) {
+    			return player.getInventory().getItemInMainHand();
+    		} else {
+    			ChatManager.getInstance().log("&cProvided slot ID does not exist! Should be between 0 and 8!");
+    			return null;
+    		}
+    	}
+    }
+    
+    public static void setItemInHand(Player player, ItemStack itemStack) {
+    	if (Visibility.enableOffHand) {
+    		player.getInventory().setItemInOffHand(itemStack);
+    	} else {
+    		if (Visibility.itemSlot >= 0 && Visibility.itemSlot <= 8) {
+    			player.getInventory().setItem(Visibility.itemSlot, itemStack);
+    		} else {
+    			ChatManager.getInstance().log("&cProvided slot ID does not exist! Should be between 0 and 8!");
+    		}
+    	}
+    }
 	
 	public static void setCooldown(Player player, boolean toggledState) {
 		Visibility.inCooldown.put(player.getUniqueId(), Long.valueOf(System.currentTimeMillis()));
@@ -192,7 +222,7 @@ public class Visibility extends JavaPlugin {
 			Method nmsItemMethod = nmsItemClass.getMethod("getById", int.class);
 			@SuppressWarnings("deprecation")
 			Object nmsItemId = nmsItemMethod.invoke(null, Visibility.createItemStack(toggledState).getTypeId());
-			Object packetPlayOutSetCooldown = Visibility.getNMSClass("PacketPlayOutSetCooldown").getConstructor(new Class[] { nmsItemClass, int.class }).newInstance(new Object[] { nmsItemId, 20 * Visibility.timeCooldown});
+			Object packetPlayOutSetCooldown = Visibility.getNMSClass("PacketPlayOutSetCooldown").getConstructor(new Class[] { nmsItemClass, int.class }).newInstance(new Object[] { nmsItemId, 20 * Visibility.toggleCooldown});
 	
 			Object playerNMS = player.getClass().getMethod("getHandle", new Class[0]).invoke(player, new Object[0]);
 			Object playerConnection = playerNMS.getClass().getField("playerConnection").get(playerNMS);
@@ -223,28 +253,33 @@ public class Visibility extends JavaPlugin {
 	}
 	
 	public void loadConfig() {
-		Visibility.isDyeEnabled = getConfig().getBoolean("enableDye");
-		Visibility.actionBar = getConfig().getBoolean("messages.actionbar");
+		Visibility.enableActionbar = getConfig().getBoolean("options.enableActionbar");
+		Visibility.enableDyes = getConfig().getBoolean("options.enableDyes");
+		Visibility.enableItemSwitchMessage = getConfig().getBoolean("options.enableItemSwitchMessage");
+		Visibility.enableJoinMessage = getConfig().getBoolean("options.enableJoinMessage");
+		Visibility.enableOffHand = getConfig().getBoolean("options.enableOffHand");
+		Visibility.enableWorldToggleMessage = getConfig().getBoolean("options.enableWorldToggleMessage");
+		Visibility.enableWorldSwitchMessage = getConfig().getBoolean("options.enableWorldSwitchMessage");
+		Visibility.toggleCooldown = getConfig().getInt("options.toggleCooldown");
 		Visibility.dyeColorOn = getConfig().getString("item.true.dye");
 		Visibility.dyeColorOff = getConfig().getString("item.false.dye");
 		Visibility.itemIdOn = getConfig().getString("item.true.item");
 		Visibility.itemIdOff = getConfig().getString("item.false.item");
-		Visibility.timeCooldown = getConfig().getInt("cooldown");
 		Visibility.itemSlot = getConfig().getInt("item.slot");
 		Visibility.itemNameOn = getConfig().getString("item.true.name");
 		Visibility.itemNameOff = getConfig().getString("item.false.name");
 		Visibility.itemLoreOn = (ArrayList<String>) getConfig().getStringList("item.true.lore");
 		Visibility.itemLoreOff = (ArrayList<String>) getConfig().getStringList("item.false.lore");
 		Visibility.messagePrefix = getConfig().getString("messages.prefix");
-		Visibility.messageCooldown = getConfig().getString("messages.cooldown");
+		Visibility.messageCooldown = getConfig().getString("messages.toggleCooldown");
 		Visibility.messagePermission = getConfig().getString("messages.permission");
 		Visibility.messageToggleOn = getConfig().getString("messages.toggle.true");
 		Visibility.messageToggleOff = getConfig().getString("messages.toggle.false");
 		Visibility.messageWorld = getConfig().getString("messages.world");
-		Visibility.messageNoSwitch = getConfig().getString("messages.switch");
+		Visibility.messageSwitch = getConfig().getString("messages.itemSwitch");
 		Visibility.messageAlreadyOn = getConfig().getString("messages.toggle.already.true");
 		Visibility.messageAlreadyOff = getConfig().getString("messages.toggle.already.false");
-		Visibility.enabledWorlds = getConfig().getStringList("Enabled-Worlds");
+		Visibility.enabledWorlds = getConfig().getStringList("enabled-Worlds");
 		Visibility.configVersion = getConfig().getString("config");
 	}
 }
