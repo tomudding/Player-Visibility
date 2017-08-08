@@ -66,15 +66,15 @@ public class Visibility extends JavaPlugin {
 	public static HashMap<UUID, Long> inCooldown = new HashMap<UUID, Long>();
 	
 	public void onEnable() {
-		ChatManager.getInstance().log("Starting Player Visibility for Bukkit");
+		ChatManager.getInstance().log("Starting Player Visibility for Bukkit/Spigot");
 		
-		if (!(getServerVersion().contains("1_9")) && !(getServerVersion().contains("1_10")) && !(getServerVersion().contains("1_11"))) {
+		if (checkServerVersion()) {
 			ChatManager.getInstance().log("&c==========================================");
 			ChatManager.getInstance().log("&cWARNING: Your server software is outdated!");
 			ChatManager.getInstance().log("&cWARNING: This plugin requires at least");
 			ChatManager.getInstance().log("&cWARNING: Minecraft version 1.9 or higher.");
 			ChatManager.getInstance().log("&c==========================================");
-			ChatManager.getInstance().log("Disabling Player Visibility for Bukkit");
+			ChatManager.getInstance().log("Disabling Player Visibility for Bukkit/Spigot");
 			Plugin plugin = Bukkit.getPluginManager().getPlugin("Visibility");
 			plugin.getPluginLoader().disablePlugin(plugin);
 			return;
@@ -99,20 +99,26 @@ public class Visibility extends JavaPlugin {
 		getCommand("hide").setExecutor(new Commands(this));
 		getCommand("show").setExecutor(new Commands(this));
 		
-		ChatManager.getInstance().log("Player Visibility for Bukkit is now enabled");
+		ChatManager.getInstance().log("Player Visibility for Bukkit/Spigot is now enabled");
 	}
 	
 	public void onDisable() {
-		ChatManager.getInstance().log("Disabling Player Visibility for Bukkit");
-		ChatManager.getInstance().log("Player Visibility for Bukkit is now disabled");
+		ChatManager.getInstance().log("Disabling Player Visibility for Bukkit/Spigot");
+		ChatManager.getInstance().log("Player Visibility for Bukkit/Spigot is now disabled");
 	}
 	
 	public static Plugin getInstance() {
 		return Bukkit.getServer().getPluginManager().getPlugin("Visibility");
 	}
 	
-	public static String getServerVersion() {
-		return Bukkit.getServer().getClass().getPackage().getName().substring(23);
+	public static boolean checkServerVersion() {
+		String version = Bukkit.getServer().getClass().getPackage().getName().substring(23);
+		return (!(version.contains("1_9")) && !(version.contains("1_10")) && !(version.contains("1_11")) && !(version.contains("1_12")));
+	}
+	
+	public static boolean checkServerVersionAbove1_12() {
+		String version = Bukkit.getServer().getClass().getPackage().getName().substring(23);
+		return (!(version.contains("1_9")) && !(version.contains("1_10")) && !(version.contains("1_11")));
 	}
 	
 	public static Class<?> getNMSClass(String nmsClassName) throws ClassNotFoundException {
