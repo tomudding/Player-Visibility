@@ -1,5 +1,7 @@
 package nl.tomudding.plugins.visibility.managers;
 
+import java.lang.reflect.Constructor;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -20,14 +22,20 @@ public class ChatManager {
 	public void sendMessage(Player player, String message) {
 		if (Visibility.enableActionbar) {
 			try {
-				Object chatComponentText = Visibility.getNMSClass("ChatComponentText").getConstructor(new Class[] { String.class }).newInstance(new Object[] { ChatColor.translateAlternateColorCodes('&', message)});
-				Class<?> iChatBaseComponent = Visibility.getNMSClass("IChatBaseComponent");
-				Object packetPlayOutChat = Visibility.getNMSClass("PacketPlayOutChat").getConstructor(new Class[] { iChatBaseComponent, Byte.TYPE }).newInstance(new Object[] { chatComponentText, Byte.valueOf((byte) 2) });
-				
-				Object playerNMS = player.getClass().getMethod("getHandle", new Class[0]).invoke(player, new Object[0]);
+				Object packetPlayOutChat = null;
+				if (Visibility.checkServerVersionAbove1_12()) {
+		            Constructor<?> constructor = Visibility.getNMSClass("PacketPlayOutChat").getConstructor(Visibility.getNMSClass("IChatBaseComponent"), Visibility.getNMSClass("ChatMessageType"));
+		            Object iChatBaseComponent = Visibility.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + ChatColor.translateAlternateColorCodes('&', message) + "\"}");
+		            packetPlayOutChat = constructor.newInstance(iChatBaseComponent, Visibility.getNMSClass("ChatMessageType").getEnumConstants()[2]);
+		         } else {
+					Constructor<?> constructor = Visibility.getNMSClass("PacketPlayOutChat").getConstructor(Visibility.getNMSClass("IChatBaseComponent"), byte.class);
+					Object iChatBaseComponent = Visibility.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + ChatColor.translateAlternateColorCodes('&', message) + "\"}");
+					packetPlayOutChat = constructor.newInstance(iChatBaseComponent, (byte) 2);
+				}
+		
+				Object playerNMS = player.getClass().getMethod("getHandle").invoke(player);
 				Object playerConnection = playerNMS.getClass().getField("playerConnection").get(playerNMS);
-				Class<?> playerPacket = Visibility.getNMSClass("Packet");
-				playerConnection.getClass().getMethod("sendPacket", new Class[] { playerPacket }).invoke(playerConnection, new Object[] { packetPlayOutChat });
+				playerConnection.getClass().getMethod("sendPacket", Visibility.getNMSClass("Packet")).invoke(playerConnection, packetPlayOutChat);
 			} catch (Exception exception) {
 				exception.printStackTrace();
 			}
@@ -39,14 +47,20 @@ public class ChatManager {
 	public void sendMessage(Player player, String message, boolean cmd, boolean cmdPrefix) {
 		if (Visibility.enableActionbar) {
 			try {
-				Object chatComponentText = Visibility.getNMSClass("ChatComponentText").getConstructor(new Class[] { String.class }).newInstance(new Object[] { ChatColor.translateAlternateColorCodes('&', message)});
-				Class<?> iChatBaseComponent = Visibility.getNMSClass("IChatBaseComponent");
-				Object packetPlayOutChat = Visibility.getNMSClass("PacketPlayOutChat").getConstructor(new Class[] { iChatBaseComponent, Byte.TYPE }).newInstance(new Object[] { chatComponentText, Byte.valueOf((byte) 2) });
-				
-				Object playerNMS = player.getClass().getMethod("getHandle", new Class[0]).invoke(player, new Object[0]);
+				Object packetPlayOutChat = null;
+				if (Visibility.checkServerVersionAbove1_12()) {
+		            Constructor<?> constructor = Visibility.getNMSClass("PacketPlayOutChat").getConstructor(Visibility.getNMSClass("IChatBaseComponent"), Visibility.getNMSClass("ChatMessageType"));
+		            Object iChatBaseComponent = Visibility.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + ChatColor.translateAlternateColorCodes('&', message) + "\"}");
+		            packetPlayOutChat = constructor.newInstance(iChatBaseComponent, Visibility.getNMSClass("ChatMessageType").getEnumConstants()[2]);
+		         } else {
+					Constructor<?> constructor = Visibility.getNMSClass("PacketPlayOutChat").getConstructor(Visibility.getNMSClass("IChatBaseComponent"), byte.class);
+					Object iChatBaseComponent = Visibility.getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + ChatColor.translateAlternateColorCodes('&', message) + "\"}");
+					packetPlayOutChat = constructor.newInstance(iChatBaseComponent, (byte) 2);
+				}
+		
+				Object playerNMS = player.getClass().getMethod("getHandle").invoke(player);
 				Object playerConnection = playerNMS.getClass().getField("playerConnection").get(playerNMS);
-				Class<?> playerPacket = Visibility.getNMSClass("Packet");
-				playerConnection.getClass().getMethod("sendPacket", new Class[] { playerPacket }).invoke(playerConnection, new Object[] { packetPlayOutChat });
+				playerConnection.getClass().getMethod("sendPacket", Visibility.getNMSClass("Packet")).invoke(playerConnection, packetPlayOutChat);
 			} catch (Exception exception) {
 				exception.printStackTrace();
 			}
