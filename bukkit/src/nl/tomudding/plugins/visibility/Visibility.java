@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -87,7 +86,7 @@ public class Visibility extends JavaPlugin {
 		
 		loadConfig();
 		
-		if (!StringUtils.substring(getDescription().getVersion(), 0, 3).contains(configVersion)) {
+		if (!getDescription().getVersion().substring(0, 3).contains(configVersion)) {
 			ChatManager.getInstance().log("&cWARNING: Config.yml version: "+Visibility.configVersion+". Plugin version: "+getDescription().getVersion()+"!");
 			ChatManager.getInstance().log("&cWARNING: Config.yml is not the correct version, delete 'config.yml' and restart the server!");
 		} else {
