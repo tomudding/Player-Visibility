@@ -56,4 +56,4 @@ messages:
   world: "&cYou can't hide/unhide players in this world."
   itemSwitch: "&cYou can't change this item its place."
 
-config: "2.5"
+config: "3.0"

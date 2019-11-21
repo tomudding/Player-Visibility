@@ -57,23 +57,23 @@ public class Visibility extends JavaPlugin {
 	public static String messageAlreadyOn = "&7All players are already &aon!";
 	public static String messageAlreadyOff = "&7All players are already &coff!";
 	public static String messageSwitch = "&cYou can't change this item its place.";
-	public static String configVersion = "0.0";
+	public static String configVersion = "3.0";
 	
 	public static List<String> enabledWorlds;
-	public static ArrayList<String> itemLoreOn = new ArrayList<String>(Arrays.asList("&7Toggle player visibility to &coff"));
-	public static ArrayList<String> itemLoreOff = new ArrayList<String>(Arrays.asList("&7Toggle player visibility to &aon"));
+	public static ArrayList<String> itemLoreOn = new ArrayList<String>(Arrays.asList("&7Toggle Visibility to &coff"));
+	public static ArrayList<String> itemLoreOff = new ArrayList<String>(Arrays.asList("&7Toggle Visibility to &aon"));
 	public static HashMap<UUID, Long> inCooldown = new HashMap<UUID, Long>();
 	
 	public void onEnable() {
-		ChatManager.getInstance().log("Starting Player Visibility for Bukkit/Spigot");
+		ChatManager.getInstance().log("Starting Visibility...");
 		
 		if (checkServerVersion()) {
 			ChatManager.getInstance().log("&c==========================================");
 			ChatManager.getInstance().log("&cWARNING: Your server software is outdated!");
 			ChatManager.getInstance().log("&cWARNING: This plugin requires at least");
-			ChatManager.getInstance().log("&cWARNING: Minecraft version 1.9 or higher.");
+			ChatManager.getInstance().log("&cWARNING: Minecraft version 1.13 or higher.");
 			ChatManager.getInstance().log("&c==========================================");
-			ChatManager.getInstance().log("Disabling Player Visibility for Bukkit/Spigot");
+			ChatManager.getInstance().log("Disabling Visibility...");
 			Plugin plugin = Bukkit.getPluginManager().getPlugin("Visibility");
 			plugin.getPluginLoader().disablePlugin(plugin);
 			return;
@@ -87,10 +87,8 @@ public class Visibility extends JavaPlugin {
 		loadConfig();
 		
 		if (!getDescription().getVersion().substring(0, 3).contains(configVersion)) {
-			ChatManager.getInstance().log("&cWARNING: Config.yml version: "+Visibility.configVersion+". Plugin version: "+getDescription().getVersion()+"!");
-			ChatManager.getInstance().log("&cWARNING: Config.yml is not the correct version, delete 'config.yml' and restart the server!");
-		} else {
-			ChatManager.getInstance().log("&aConfig.yml version matches required version.");
+            ChatManager.getInstance().log("&cWARNING: config.yml is not the correct version, delete 'config.yml' and restart the server!");
+			ChatManager.getInstance().log("&cWARNING: config.yml version: " + Visibility.configVersion + ". Plugin version: " + getDescription().getVersion() + "!");
 		}
 		
 		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
@@ -98,12 +96,12 @@ public class Visibility extends JavaPlugin {
 		getCommand("hide").setExecutor(new Commands(this));
 		getCommand("show").setExecutor(new Commands(this));
 		
-		ChatManager.getInstance().log("Player Visibility for Bukkit/Spigot is now enabled");
+		ChatManager.getInstance().log("Visibility is now enabled...");
 	}
 	
 	public void onDisable() {
-		ChatManager.getInstance().log("Disabling Player Visibility for Bukkit/Spigot");
-		ChatManager.getInstance().log("Player Visibility for Bukkit/Spigot is now disabled");
+		ChatManager.getInstance().log("Disabling Visibility...");
+		ChatManager.getInstance().log("Visibility is now disabled...");
 	}
 	
 	public static Plugin getInstance() {
@@ -112,12 +110,7 @@ public class Visibility extends JavaPlugin {
 	
 	public static boolean checkServerVersion() {
 		String version = Bukkit.getServer().getClass().getPackage().getName().substring(23);
-		return (!(version.contains("1_9")) && !(version.contains("1_10")) && !(version.contains("1_11")) && !(version.contains("1_12")));
-	}
-	
-	public static boolean checkServerVersionAbove1_12() {
-		String version = Bukkit.getServer().getClass().getPackage().getName().substring(23);
-		return (!(version.contains("1_9")) && !(version.contains("1_10")) && !(version.contains("1_11")));
+		return (!(version.contains("1_13")) && !(version.contains("1_14")));
 	}
 	
 	public static Class<?> getNMSClass(String nmsClassName) throws ClassNotFoundException {
@@ -225,7 +218,6 @@ public class Visibility extends JavaPlugin {
 		try {
 			Class<?> nmsItemClass = Visibility.getNMSClass("Item");
 			Method nmsItemMethod = nmsItemClass.getMethod("getById", int.class);
-			@SuppressWarnings("deprecation")
 			Object nmsItemId = nmsItemMethod.invoke(null, Visibility.createItemStack(toggledState).getTypeId());
 			Object packetPlayOutSetCooldown = Visibility.getNMSClass("PacketPlayOutSetCooldown").getConstructor(new Class[] { nmsItemClass, int.class }).newInstance(new Object[] { nmsItemId, 20 * Visibility.toggleCooldown});
 	
@@ -244,7 +236,6 @@ public class Visibility extends JavaPlugin {
 		try {
 			Class<?> nmsItemClass = Visibility.getNMSClass("Item");
 			Method nmsItemMethod = nmsItemClass.getMethod("getById", int.class);
-			@SuppressWarnings("deprecation")
 			Object nmsItemId = nmsItemMethod.invoke(null, Visibility.createItemStack(toggledState).getTypeId());
 			Object packetPlayOutSetCooldown = Visibility.getNMSClass("PacketPlayOutSetCooldown").getConstructor(new Class[] { nmsItemClass, int.class }).newInstance(new Object[] { nmsItemId, 0 });
 	
